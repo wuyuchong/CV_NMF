@@ -49,3 +49,16 @@ plotVar=function(nmfw)
   }
   dev.off()
 }
+
+plotNMFforestPCA = function()
+{
+  rfrate = read.csv("../output/correctRFdimNMF.csv")$correct_rate
+  corpca = read.csv("../output/correctRFdimPCA.csv")$correct_rate
+  pdf('../figure/PCA及NMF在不同维数预测的正确率线图.pdf')
+  plot(corpca,type="b",col="lightblue",pch=1,xlab="维数",ylab="准确率",
+  main="PCA及NMF在不同维数预测的正确率线图",ylim=c(0,1))
+  lines(rfrate,type="b",col="pink",pch=2)
+  legend("bottomright",inset=0.05,title="PCA and NMF",c("PCA","NMF"),
+  lty=c(1,1),pch=c(1,2),col=c("lightblue","pink"))
+  dev.off()
+}

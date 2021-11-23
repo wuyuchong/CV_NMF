@@ -49,9 +49,15 @@ tableWeight(nmfh, train)
 
 
 # ------------> 随机森林
-forest(train, test)
+# forest(train, test)
 
 
-
+# ------------> 用非负矩阵分解的预测：降低维数与预测正确率
+# NMF
+# forestDimNMF(train, test)
+# PCA
+forestDimPCA(train, test)
+# plot
+plotNMFforestPCA()
 
 

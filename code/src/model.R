@@ -40,7 +40,6 @@ forest = function(train, test)
 {
   feattrda = data.frame(train[['x']], num = train[['y']])
   featteda = data.frame(test[['x']], num = test[['y']])
-
   feattrda$num=as.factor(feattrda$num)
   featteda$num=as.factor(featteda$num)
 
@@ -49,11 +48,11 @@ forest = function(train, test)
   rf1=randomForest(num~.,feattrda,mtry=16,ntree=10,importance=T)
   prerf1=predict(rf1,featteda,type="class")
   #总体预测正确率
-  sum(prerf1==featteda[,ncol(featteda)])/nrow(featteda)
+  print(sum(prerf1==featteda[,ncol(featteda)])/nrow(featteda))
   #不同数字正确率
   for(i in 1:10)
   {
-    tr0=(datatenum==i)
+    tr0=(featteda$num==(i-1))
     difnumtot[,i]=sum(prerf1[tr0]==featteda[tr0,ncol(featteda)])/sum(tr0)
   }
   write.csv(difnumtot,"../output/随机森林不同类别预测正确率.csv")
@@ -65,3 +64,67 @@ forest = function(train, test)
   xlab="类别",ylab="正确率")
   dev.off()
 }
+
+
+forestDimNMF = function(train, test)
+{
+  feattrda = data.frame(train[['x']], num = train[['y']])
+  featteda = data.frame(test[['x']], num = test[['y']])
+  feattrda$num=as.factor(feattrda$num)
+  featteda$num=as.factor(featteda$num)
+  datatot=rbind(feattrda,featteda)
+  trnum = c(1:nrow(feattrda))
+  tenum = c(1:nrow(featteda))
+
+  rfrate=rep(0,15)
+  for(i in 1:15)
+  {
+    nmftot=nnmf(t(datatot[,1:ncol(datatot) - 1]),i)
+    nmfwtot=nmftot[[1]]#基矩阵
+    nmfhtot=nmftot[[2]]#系数矩阵
+    nmfdata=as.data.frame(t(nmfhtot))
+    nmfdatay=cbind(nmfdata,datatot[, ncol(datatot)])
+    names(nmfdatay)[i+1]="num"
+    nmfdatay$num=as.factor(nmfdatay$num)
+    #随机森林
+    # rfnmf=randomForest(num~.,nmfdatay[trnum,],mtry=ceiling(sqrt(i)),ntree=100)
+    rfnmf=randomForest(num~.,nmfdatay[trnum,],mtry=ceiling(sqrt(i)),ntree=10)
+    prenmf=predict(rfnmf,nmfdatay[tenum,],type="class")
+    rfrate[i]=sum(prenmf==nmfdatay[tenum,i+1])/length(tenum)
+  }
+  correctRFdimNMF = data.frame(dim = 1: 15, correct_rate = rfrate)
+  write.csv(correctRFdimNMF, "../output/correctRFdimNMF.csv", row.names = FALSE)
+}
+
+
+forestDimPCA = function(train, test)
+{
+  feattrda = data.frame(train[['x']], num = train[['y']])
+  featteda = data.frame(test[['x']], num = test[['y']])
+  feattrda$num=as.factor(feattrda$num)
+  featteda$num=as.factor(featteda$num)
+  datatot=rbind(feattrda,featteda)
+  trnum = c(1:nrow(feattrda))
+  tenum = c(1:nrow(featteda))
+
+  numpca=princomp(datatot[,1: (ncol(datatot) - 1)],cor=TRUE)
+  pcasum=summary(numpca,loadings=TRUE)
+  pcasum$loadings[,1]
+  datatot1=as.matrix(datatot[,1: (ncol(datatot) - 1)])
+  corpca=rep(0,15)
+  for(i in 1:15)
+  {
+    datapca=datatot1%*%as.matrix(pcasum$loadings[,1:i])
+    datapca1=as.data.frame(cbind(datapca,datatot[,ncol(datatot)]))
+    names(datapca1)[i+1]="num"
+    datapca1$num=as.factor(datapca1$num)
+    #随机森林
+    # rfpca=randomForest(num~.,datapca1[trnum,],mtry=ceiling(sqrt(i)),ntree=100)
+    rfpca=randomForest(num~.,datapca1[trnum,],mtry=ceiling(sqrt(i)),ntree=10)
+    prepca=predict(rfpca,datapca1[tenum,],type="class")
+    corpca[i]=sum(prepca==datapca1$num[tenum])/length(tenum)
+  }
+  correctRFdimPCA = data.frame(dim = 1: 15, correct_rate = corpca)
+  write.csv(correctRFdimPCA, "../output/correctRFdimNMF.csv", row.names = FALSE)
+}
+
