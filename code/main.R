@@ -6,8 +6,7 @@ library(nnet)
 library(randomForest)
 
 
-
-# ------------> 加载函数
+# ------------> 加载依赖函数
 source("src/load.R")
 source("src/plot.R")
 source("src/table.R")
@@ -16,7 +15,7 @@ source("src/model.R")
 
 # ------------> 加载数据集
 load_mnist()
-class_names = c('T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot')
+classNames = c('T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot')
 
 
 # ------------> 标准化: -1 -- 1
@@ -25,23 +24,23 @@ test[['Xscaled']] = (test[['x']] - 127.5) / 127.5
 
 
 # ------------> 绘图：原数据集
-plotRaw(train[['x']][1, ])
+# plotRaw(train[['x']][1, ])
 
 
 # ------------> 非负矩阵分解: 求解
 # datanmf = nnmf(t(train[['x']]),12)
 # save(datanmf, file = '../model/datanmf.RData')
-load("../model/datanmf.RData")
-nmfw = datanmf[[1]]#基矩阵
-nmfh = datanmf[[2]]#系数矩阵
+# load("../model/datanmf.RData")
+# nmfw = datanmf[[1]]#基矩阵
+# nmfh = datanmf[[2]]#系数矩阵
 
 
 # ------------> 绘图：降维后的变量图
-plotVar(nmfw)
+# plotVar(nmfw)
 
 
 # ------------> 表格：降维后类别的权重
-tableWeight(nmfh, train)
+# tableWeight(nmfh, train)
 
 
 # ------------> 神经网络
@@ -49,15 +48,22 @@ tableWeight(nmfh, train)
 
 
 # ------------> 随机森林
-# forest(train, test)
+# forest(train, test, classNames)
 
 
-# ------------> 用非负矩阵分解的预测：降低维数与预测正确率
+# ------------> NMF / PCA - 维度 - 随机森林
 # NMF
 # forestDimNMF(train, test)
 # PCA
-forestDimPCA(train, test)
+# forestDimPCA(train, test)
 # plot
-plotNMFforestPCA()
+# plotNMFforestPCA()
+
+
+# ------------> NMF / PCA - 维度 - 种类 - 随机森林
+# NMF
+# forestDimClassNMF(train, test, classNames)
+# PCA
+# forestDimClassPCA(train, test, classNames)
 
 
