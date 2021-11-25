@@ -1,0 +1,182 @@
+---
+documentclass: ctexart
+output:
+  rticles::ctex:
+    fig_caption: yes
+    number_sections: yes
+    template: template.tex
+    highlight: tango
+classoption: "hyperref,"
+geometry: margin=1in
+csl: chinese-gb7714-2005-numeric.csl
+bibliography: reference.bib
+header-includes:
+   - \usepackage{graphicx}
+   - \usepackage{float}
+   - \usepackage{indentfirst}
+   - \setlength{\parindent}{4em}
+logo: "cufe.jpg"
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(fig.pos = 'H', echo = FALSE, warning = FALSE, message = FALSE, comment = NA)
+library(rmarkdown)
+library(knitr)
+library(tidyverse)
+library(scales)
+# base_family = 'STXihei'
+```
+
+# 摘要{-}
+
+深度学习
+全模型和降维
+
+使用降维的模型准确率下降程度较小，可较大程度地加快模型的训练速度
+
+\tableofcontents
+
+\newpage
+
+# 数据集介绍
+
+```{r, out.width='70%', fig.align='center', fig.cap = '数据集概览'}
+knitr::include_graphics("../figure/fashion-mnist-sprite.png")
+```
+
+我们使用 `Fashion-MNIST` 数据集^[https://github.com/zalandoresearch/fashion-mnist] ，它共有 6 万条训练样本和 1 万条测试样本，图片像素为 28 X 28，颜色为灰度。这些图片为服饰的照片，共分为 10 类。@xiao2017online
+
+
+```{r}
+classNames = c("T恤/上衣" , "裤子" , "套头衫" , "连衣裙" , "外套" , "凉鞋" , "衬衫" , "运动鞋" , "包" , "短靴")
+labels = data.frame(标签 = 0:9, 名称 = classNames)
+kable(t(labels), caption = '标签与分类名称')
+```
+
+使用 R 画出一个示例图像如下：
+
+```{r, out.width='30%', fig.align='center', fig.cap = '图像示例'}
+knitr::include_graphics("../figure/图像示例.pdf")
+```
+
+在数据预处理中，我们使用标准化对灰度值进行处理，以提高模型收敛的速度和效果。
+
+$$x_{i}^{\prime}=\frac{x_{i}-(\max (x)-\min (x)) / 2}{(\max (x)-\min (x)) / 2}$$
+
+# 未降维模型效果
+
+## NNET
+
+我们使用 NNET @nnet
+
+```{r}
+table = read.csv("../output/corrateNNET.csv")
+table = mutate(table, corrate_rate = percent(corrate_rate, 2))
+names(table) = c("网络大小", "准确率")
+kable(t(table), caption = '神经网络模型的准确率')
+```
+
+## TensorFlow
+
+我们使用 python 在 `TensorFlow` 框架下搭建一个多层神经网络。 @tensorflow 我们在中间层使用 Relu 作为激活函数，在输出层使用 Softmax，使用 Adam 作为优化器。
+
+```{r}
+神经网络层 = c('输入层', 'drop out (20%)', '中间层1', 'drop out (50%)', '中间层2', 'drop out (50%)', '输出层')
+神经元个数 = c(784, 0, 128, 0, 128, 0, 10)
+table = data.frame(神经网络层, 神经元个数)
+kable(table, caption = '搭建的神经网络结构')
+```
+
+```{r, out.width='99%', fig.align='center', fig.cap = '深度学习预测结果'}
+knitr::include_graphics("../figure/深度学习预测结果.pdf")
+```
+
+## 随机森林
+
+搭建一个树的数目取 10 的随机森林模型 @randomForest
+
+```{r, out.width='99%', fig.align='center', fig.cap = '随机森林不同类别预测正确率'}
+knitr::include_graphics("../figure/随机森林不同类别预测正确率.pdf")
+```
+
+# 降维
+
+## 降维后特征
+
+我们使用 NMF @liumiao 将数据集降维至 12 维，降维后的新变量反映了原数据集中各个类别的特征。
+
+```{r, out.width='70%', fig.align='center', fig.cap = '降维后的新变量'}
+knitr::include_graphics("../figure/降维后的新变量图.pdf")
+```
+
+```{r}
+table = read.csv("../output/10种不同类别在前六个新变量中的权重.csv")
+kable(table, caption = '不同类别在前六个新变量中的权重')
+```
+
+## PCA 和 NMF 降维效果对比
+
+```{r, out.width='70%', fig.align='center', fig.cap = 'PCA及NMF在不同维数预测的正确率线图'}
+knitr::include_graphics("../figure/PCA及NMF在不同维数预测的正确率线图.pdf")
+```
+
+```{r, out.width='70%', fig.align='center', fig.cap = 'NMF不同类别不同降维度的预测正确率'}
+knitr::include_graphics("../figure/NMF不同类别不同降维度的预测正确率.pdf")
+```
+
+```{r, out.width='70%', fig.align='center', fig.cap = 'PCA不同类别不同降维度的预测正确率'}
+knitr::include_graphics("../figure/PCA不同类别不同降维度的预测正确率.pdf")
+```
+
+# 错判结果分析
+
+```{r, out.width='90%', fig.align='center', fig.cap = 'NMF维度是6的类别错判图'}
+knitr::include_graphics("../figure/NMF维度是6的类别错判图.pdf")
+```
+
+# 参考文献
+
+<div id="refs"></div>
+
+# 附录
+
+测试平台为阿里云服务器（Xeon 8核 CPU 32G 内存）
+
+## 代码目录结构
+
+```{bash, eval=F, echo=T, code=xfun::read_utf8('../structure.txt')}
+```
+
+## 主程序
+
+### R
+
+```{r, eval=F, echo=T, code=xfun::read_utf8('../code/main.R')}
+```
+
+### python: 深度学习
+
+```{python, eval=F, echo=T, code=xfun::read_utf8('../code/deep_learning.py')}
+```
+
+## 函数封装
+
+### 数据集加载
+
+```{r, eval=F, echo=T, code=xfun::read_utf8('../code/src/load.R')}
+```
+
+### 模型运行
+
+```{r, eval=F, echo=T, code=xfun::read_utf8('../code/src/model.R')}
+```
+
+### 图像输出
+
+```{r, eval=F, echo=T, code=xfun::read_utf8('../code/src/plot.R')}
+```
+
+### 表格输出
+
+```{r, eval=F, echo=T, code=xfun::read_utf8('../code/src/table.R')}
+```
