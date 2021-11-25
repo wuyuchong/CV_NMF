@@ -1,9 +1,10 @@
-tableWeight = function(nmfh, train)
+tableWeight = function(nmfh, train, labels)
 {
   nmfht=t(nmfh)
   nmfhy=cbind(nmfht, train[['y']])#合并后矩阵
   nmfhy=as.data.frame(nmfhy)
-  print(names(nmfhy))
+
+  var1=arrange(aggregate(V1~V13,nmfhy,mean),desc(V1))#排序第1个变量
 
   var1=arrange(aggregate(V1~V13,nmfhy,mean),desc(V1))#排序第1个变量
 
@@ -29,6 +30,16 @@ tableWeight = function(nmfh, train)
 
   var12=arrange(aggregate(V12~V13,nmfhy,mean),desc(V12))#排序第12个变量
 
-  write.csv(cbind(var1,var8,var10),"../output/10种不同类别在不同新变量中的权重.csv")
+  raw = data.frame(var1[, 1], var2[, 1], var3[, 1], var4[, 1], var5[, 1], var6[, 1])
+  table = data.frame(权重排名 = 1:10)
+  for(i in 1:ncol(raw))
+  {
+    co = data.frame(raw[, i])
+    names(co) = 'label'
+    co = dplyr::left_join(co, labels, by = "label")
+    co = data.frame(co[, 2])
+    names(co) = paste("变量", i)
+    table = cbind(table, co)
+  }
+  write.csv(table, "../output/10种不同类别在前六个新变量中的权重.csv", row.names = FALSE)
 }
-

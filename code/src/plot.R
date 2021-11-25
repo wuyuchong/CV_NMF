@@ -16,14 +16,14 @@ plotRaw = function(feature)
     b1=numrgb[i]
     rgbcolor=c(rgbcolor,rgb(r1,g1,b1,max=255)) 
   }
-  pdf('../figure/raw.pdf')
+  pdf('../figure/图像示例.pdf')
   plot(rgbx,rgby,col=rgbcolor,type="p",pch=15,cex=3,xlab="",ylab="")
   dev.off()
 }
 
 plotVar=function(nmfw)
 {
-  pdf('../figure/var.pdf')
+  pdf('../figure/降维后的新变量图.pdf')
   par(mfrow = c(3, 4))
   for(i in 1: ncol(nmfw))
   {
@@ -54,9 +54,8 @@ plotNMFforestPCA = function()
 {
   rfrate = read.csv("../output/correctRFdimNMF.csv")$correct_rate
   corpca = read.csv("../output/correctRFdimPCA.csv")$correct_rate
-  pdf('../figure/PCA及NMF在不同维数预测的正确率线图.pdf')
-  # par(family = "SimHei")
-  plot(corpca,type="b",col="lightblue",pch=1,xlab="dimensions",ylab="correct rate", ,ylim=c(0,1))
+  pdf('../figure/PCA及NMF在不同维数预测的正确率线图.pdf', family = 'GB1', width = 8, height = 4)
+  plot(corpca,type="b",col="lightblue",pch=1,xlab="维度",ylab="正确率", ylim=c(0,1))
   lines(rfrate,type="b",col="pink",pch=2)
   legend("bottomright",inset=0.05,title="PCA and NMF",c("PCA","NMF"),
   lty=c(1,1),pch=c(1,2),col=c("lightblue","pink"))
