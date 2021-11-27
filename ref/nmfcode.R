@@ -82,7 +82,9 @@ plotnum=function(feature)
     b1=numrgb[i]
     rgbcolor=c(rgbcolor,rgb(r1,g1,b1,max=255)) 
   }
+  png('./temp.png')
   plot(rgbx,rgby,col=rgbcolor,type="p",pch=15,cex=3)
+  dev.off()
 }
 
 #数据前9个数及其对应图
@@ -160,7 +162,6 @@ plotvar=function(nmfwma,plotname)
   plot(rgbx,rgby,col=rgbcolor,type="p",pch=15,cex=3,
   main=plotname)
 }
-?nnmf
 plotvar(nmfw[,1],"第1个新变量灰度图")
 plotvar(nmfw[,2],"第2个新变量灰度图")
 plotvar(nmfw[,3],"第3个新变量灰度图")

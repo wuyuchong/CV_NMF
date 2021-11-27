@@ -26,51 +26,50 @@ test[['Xscaled']] = (test[['x']] - 127.5) / 127.5
 
 
 # ------------> 绘图：原数据集
-# plotRaw(train[['x']][1, ])
+plotRaw(train[['x']][1, ])
 
 
 # ------------> 非负矩阵分解: 求解
-# datanmf = nnmf(t(train[['x']]),12)
-# save(datanmf, file = '../model/datanmf.RData')
+datanmf = nnmf(t(train[['x']]),12)
+save(datanmf, file = '../model/datanmf.RData')
 load("../model/datanmf.RData")
 nmfw = datanmf[[1]]#基矩阵
 nmfh = datanmf[[2]]#系数矩阵
 
 
 # ------------> 绘图：降维后的变量图
-# plotVar(nmfw)
+plotVar(nmfw)
 
 
 # ------------> 表格：降维后类别的权重
-# tableWeight(nmfh, train, labels)
+tableWeight(nmfh, train, labels)
 
 
 # ------------> 神经网络
-# neural(train, test)
+neural(train, test)
 
 
 # ------------> 随机森林
-# forest(train, test, classNames)
+forest(train, test, classNames)
 
 
 # ------------> NMF / PCA - 维度 - 随机森林
 # NMF
-# forestDimNMF(train, test)
+forestDimNMF(train, test)
 # PCA
-# forestDimPCA(train, test)
+forestDimPCA(train, test)
 # plot
-# plotNMFforestPCA()
+plotNMFforestPCA()
 
 
 # ------------> NMF / PCA - 维度 - 种类 - 随机森林
 # NMF
-# forestDimClassNMF(train, test, classNames)
+forestDimClassNMF(train, test, classNames)
 # PCA
-# forestDimClassPCA(train, test, classNames)
+forestDimClassPCA(train, test, classNames)
 
 
 # ------------> NMF - 随机森林 - 错判图
-misJudge(train, test, classNames, 6)
-misJudge(train, test, classNames, 12)
+misJudge(train, test, classNames, 1)
 
 

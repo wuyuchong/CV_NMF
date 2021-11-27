@@ -290,7 +290,7 @@ misJudge= function(train, test, classNames, dimension)
   nmfdata6=as.data.frame(t(nmfhtot6))
   nmfdatay6=cbind(nmfdata6,datatot[, ncol(datatot)])
 
-  names(nmfdatay6)[dimentsion + 1]="num"
+  names(nmfdatay6)[dimension + 1]="num"
   nmfdatay6$num=as.factor(nmfdatay6$num)
   #随机森林
   nmfdatatr6=nmfdatay6[trnum,]
